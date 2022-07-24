@@ -14,16 +14,21 @@ object App {
       .appName("Simple Application")
       .getOrCreate()
 
+    spark.catalog.listTables().show()
     val peopleRdd = spark.sparkContext.parallelize(
       Array(Row(1L, "John", 30L), Row(2L, "Mary", 25L)
     ))
-    val schema = new StructType(Array(StructField("id", LongType, false),
-      StructField("name", StringType, false),
-      StructField("age", LongType, true)))
+    val schema = new StructType(Array(StructField("id", LongType, nullable = false),
+      StructField("name", StringType, nullable = false),
+      StructField("age", LongType, nullable = true)))
 
     val peopleDf = spark.createDataFrame(peopleRdd, schema)
     peopleDf.show()
     peopleDf.select("name").show()
+    peopleDf.createOrReplaceTempView("people")
+    spark.catalog.listTables().show()
+    log.info("================== end.")
+
     //    val rdd = spark.sparkContext.parallelize(1 to 10)
     //      .map(x => (x, Random.nextInt(100) * x))
     //      .map(kv => Row(kv._1, kv._2))
